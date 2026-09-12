@@ -71,9 +71,9 @@ affect a number:
   total. They were never a live decision, so they cannot count as one.
 - **A 3-day trial is a small sample.** One heavy night swamps it. The readout refuses to
   print a percentage when there is under two days of logged history on either side.
-- **The service worker could not be verified in the dev environment** (registration is
-  blocked there). It should give offline loading once served over HTTPS — confirm it by
-  opening the app in airplane mode after the first load. The app works fine without it.
+- **Offline loading works** — the service worker was confirmed registered and activated
+  on the live HTTPS site. Files are served cache-first and refreshed in the background,
+  so a new version can take one extra load to appear.
 - **This is not medical care.** It measures a habit. It does not treat one.
 
 ## Re-deploying

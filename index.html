@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Pass</title>
+<meta name="theme-color" content="#0E0F12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pass">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<style>
+:root{
+  --bg:#0E0F12; --surface:#16181D; --surface-2:#1E2128; --line:#2A2E37;
+  --text:#F2F3F5; --dim:#9AA0AB; --faint:#646B77;
+  --accent:#F0A93B; --accent-dim:#8A6423; --good:#5EC8A0;
+  --r:14px; --tap:52px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font:400 16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+  overscroll-behavior:none}
+body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:3px;border-radius:8px}
+.tapzone:focus-visible{outline-color:var(--text)}
+.tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(10px + env(safe-area-inset-top)) 18px 10px}
+.brand{font-size:15px;font-weight:700;letter-spacing:.16em;color:var(--accent)}
+.daychip{font-size:12px;color:var(--faint);letter-spacing:.04em}
+
+main{padding:0 18px;max-width:520px;margin:0 auto}
+.hide{display:none!important}
+
+.banner{background:#3A2410;border:1px solid #6B4318;color:#F3C98A;
+  border-radius:var(--r);padding:12px 14px;font-size:13px;margin-bottom:14px}
+
+/* ---- big actions ---- */
+.stack{display:flex;flex-direction:column;gap:12px}
+.bigbtn{min-height:96px;border-radius:var(--r);border:1px solid var(--line);
+  background:var(--surface);display:flex;flex-direction:column;justify-content:center;
+  align-items:flex-start;gap:4px;padding:18px 20px;text-align:left;width:100%;
+  transition:transform .06s ease,background .12s ease}
+.bigbtn:active{transform:scale(.985);background:var(--surface-2)}
+.bigbtn.primary{background:var(--accent);border-color:var(--accent);color:#17120A}
+.bigbtn.primary .sub{color:#4A3A18}
+.bigbtn .lbl{font-size:19px;font-weight:650;letter-spacing:-.01em}
+.bigbtn .sub{font-size:13px;color:var(--dim);line-height:1.3}
+
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+
+/* ---- counter ---- */
+.counter{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:22px 20px;text-align:center}
+.bignum{font-size:76px;line-height:1;font-weight:700;letter-spacing:-.04em}
+.capline{font-size:13px;color:var(--dim);margin-top:8px}
+.capline.over{color:var(--accent)}
+.tapzone{margin-top:16px;width:100%;min-height:120px;border-radius:var(--r);
+  background:var(--accent);color:#17120A;font-size:22px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;letter-spacing:-.01em}
+.tapzone:active{filter:brightness(.92)}
+
+.seg{display:flex;gap:6px;background:var(--surface-2);padding:5px;border-radius:12px;margin-top:14px}
+.seg button{flex:1;min-height:44px;border-radius:9px;font-size:14px;color:var(--dim);font-weight:550}
+.seg button[aria-pressed="true"]{background:var(--bg);color:var(--text)}
+
+/* ---- cards / strip ---- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 18px;margin-top:12px}
+.card h3{margin:0 0 12px;font-size:12px;font-weight:650;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint)}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;text-align:center}
+.strip div span{display:block}
+.strip .v{font-size:23px;font-weight:700;letter-spacing:-.02em}
+.strip .k{font-size:10.5px;color:var(--faint);letter-spacing:.05em;margin-top:3px}
+
+.kv{display:flex;justify-content:space-between;align-items:baseline;
+  padding:9px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--dim)}
+.kv .v{font-weight:600}
+.note{font-size:12.5px;color:var(--faint);line-height:1.5;margin-top:10px}
+.assume{color:var(--accent-dim)}
+
+.gate{text-align:center;padding:6px 0 2px}
+.gate .pct{font-size:52px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.gate .pct.pass{color:var(--good)} .gate .pct.fail{color:var(--accent)}
+.bar{height:6px;background:var(--surface-2);border-radius:3px;margin:14px 0 8px;position:relative;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);border-radius:3px}
+.bar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);opacity:.55;left:70%}
+
+ul.sessions{list-style:none;margin:0;padding:0}
+ul.sessions li{display:flex;align-items:center;gap:11px;padding:11px 0;
+  border-bottom:1px solid var(--line);font-size:14px}
+ul.sessions li:last-child{border-bottom:none}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.dot.already{background:var(--faint)} .dot.retro{background:transparent;border:1.5px solid var(--faint)}
+.dot.refusal{background:var(--good)}
+.meta{color:var(--faint);font-size:12px;margin-left:auto;text-align:right}
+
+.empty{text-align:center;padding:34px 16px;color:var(--dim);font-size:14.5px;line-height:1.6}
+.empty strong{display:block;color:var(--text);font-size:17px;margin-bottom:8px;font-weight:650}
+
+label.fld{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+label.fld:last-of-type{border-bottom:none}
+label.fld span{color:var(--dim)}
+input[type=number],input[type=time],select{background:var(--surface-2);border:1px solid var(--line);
+  color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;font-size:16px;
+  min-height:44px;width:118px;text-align:right;-webkit-appearance:none}
+select{width:148px;text-align:left}
+.btn{min-height:var(--tap);border-radius:12px;background:var(--surface-2);
+  border:1px solid var(--line);font-size:15px;font-weight:600;width:100%;margin-top:12px;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{background:var(--line)}
+.btn.accent{background:var(--accent);color:#17120A;border-color:var(--accent)}
+.btn.ghost{background:none}
+.btn.danger{color:#E8735F;border-color:#4A2620}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:right;padding:8px 4px;border-bottom:1px solid var(--line)}
+th{color:var(--faint);font-weight:600;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+th:first-child,td:first-child{text-align:left}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ---- tabs ---- */
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;
+  background:rgba(14,15,18,.94);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav button{flex:1;min-height:60px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);font-weight:650;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:5px}
+nav button[aria-current="true"]{color:var(--accent)}
+nav .ic{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round}
+
+dialog{border:none;background:var(--surface);color:var(--text);border-radius:18px;
+  padding:20px;width:calc(100vw - 40px);max-width:420px}
+dialog::backdrop{background:rgba(0,0,0,.66)}
+dialog h3{margin:0 0 4px;font-size:18px;font-weight:650}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">PASS</span>
+  <span class="daychip tnum" id="daychip"></span>
+</header>
+
+<div id="banner"></div>
+<main id="view"></main>
+
+<nav>
+  <button data-tab="now" aria-current="true">
+    <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Now</button>
+  <button data-tab="today">
+    <svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/></svg>Today</button>
+  <button data-tab="data">
+    <svg class="ic" viewBox="0 0 24 24"><path d="M4 19.5V13M10 19.5V7M16 19.5v-4M21 19.5V4"/></svg>Data</button>
+</nav>
+
+<dialog id="dlg"></dialog>
+<script src="seed.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
